@@ -1,0 +1,85 @@
+
+@import '~@fluentui/react/dist/sass/References.scss';
+@import './variables';
+
+.root {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  margin: 0; // Asegurando que no hay margen
+  padding: 0; // Asegurando que no hay padding
+  background-color: transparent; // Fondo transparente
+  position: relative;
+  max-width: 385px;
+  
+  .header {
+    display: flex;
+    flex-direction: column;
+    
+    .button {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+      width: auto;
+      margin-bottom: 1rem;
+      
+      span {
+        font-size: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        color: var(--themePrimary);
+        margin-left: 10px;
+      }
+    }
+    .breadcrumb {
+      margin-bottom: 0.8rem;
+    }
+    .categoryTitle {
+      font-size: 32px;
+      color: #666666;
+      margin: 0;
+      margin-bottom: 0.4rem;
+    }
+    .count {
+      font-size: 14px;
+      margin-bottom: 0.5em;
+      color: #A1A1A1;
+      background-color: transparent;
+      font-weight: 700;
+    }
+  }
+
+  .divider {
+    margin: 2rem 0rem;
+  }
+
+  .navDrawer {
+    background-color: transparent; // Fondo transparente para NavDrawer
+    margin: 0; // No margin
+    padding: 0; // No padding
+    border: none; // Opcional: eliminar bordes si existen
+    box-shadow: none; // Opcional: eliminar sombras si existen
+    
+    .titleItem {
+      font-size: 24px;
+      padding: 0;
+      margin-bottom: 0.5em;
+      color: var(--themePrimary);
+      background-color: transparent;
+    }
+    .navItem {
+        padding-left: 1rem;
+        margin-top: 0.3em;
+        font-size: 16px;
+        background-color: transparent;
+        &::after {
+          background-color: #004E9B;
+          margin-inline-start: -20px
+        }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "drawer-noticias-client-side-solution",
+    "id": "ba114080-9a76-4d7a-bfc8-8dad1fce8a6e",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.19.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Drawer Noticias description"
+      },
+      "longDescription": {
+        "default": "Drawer Noticias description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "drawer-noticias Feature",
+        "description": "The feature that activates elements of the drawer-noticias solution.",
+        "id": "4f2e0359-f18b-4ea7-9c97-a10b7c31a3d7",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/drawer-noticias.sppkg"
+  }
+}

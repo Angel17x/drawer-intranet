@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "drawer-noticias-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/drawerNoticias/DrawerNoticiasWebPart.js",
+          "manifest": "./src/webparts/drawerNoticias/DrawerNoticiasWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "DrawerNoticiasWebPartStrings": "lib/webparts/drawerNoticias/loc/{locale}.js"
+  }
+}
