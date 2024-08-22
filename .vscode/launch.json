@@ -5,7 +5,7 @@
       "name": "Hosted workbench",
       "type": "msedge",
       "request": "launch",
-      "url": "https://mercantilsf.sharepoint.com/_layouts/workbench.aspx",
+      "url": "https://mercantilsf.sharepoint.com/sites/IntranetDev/_layouts/workbench.aspx",
       "webRoot": "${workspaceRoot}",
       "sourceMaps": true,
       "sourceMapPathOverrides": {

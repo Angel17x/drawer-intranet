@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styles from '../styles/DrawerNoticias.module.scss';
-import type { ICategoryItem, IDrawerItem, IDrawerNoticiasProps } from '../interfaces';
+import type { ICategoryItem, IDrawerNoticiasProps } from '../interfaces';
 import { Breadcrumb, BreadcrumbButton, BreadcrumbDivider, BreadcrumbItem, Divider } from "@fluentui/react-components";
 import { Arrow } from './Arrow/Arrow';
 import {
@@ -14,9 +14,9 @@ import { SPHttpClient } from '@microsoft/sp-http';
 
 const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
 
-  const defaultCategory = "Todas Las Categorìas";
+  const defaultCategory = "Todas Las Categorías";
 
-  const [selectedValue, setSelectedValue] = React.useState<string>();
+  const [selectedValue, setSelectedValue] = React.useState<string>(defaultCategory);
   const [categories, setCategories] = React.useState<ICategoryItem[]>([]);
   
   
@@ -35,15 +35,19 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
       });
 
       const data = await response.json();
+      console.log(data.value);
       setCategories(data.value ?? []);
-      setSelectedValue(categories[0].Title ?? defaultCategory)
     } catch (error) {
       console.error('Error loading data', error);
     }
   };
 
   React.useEffect(() => {
-    fetchData();
+    setSelectedValue(defaultCategory);
+    fetchData()
+    .catch((err) => {
+      console.log(err);
+    });
   }, [])
 
   return (
@@ -66,7 +70,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
           </BreadcrumbItem>
         </Breadcrumb>
         {
-          categories.length != 0 ?
+          categories.length !== 0 ?
           <h2 className={styles.categoryTitle}>{categories.filter((x:ICategoryItem) => x.Title === selectedValue)[0]?.Title}</h2>
           : <h2>{defaultCategory}</h2>
         }
@@ -83,7 +87,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
       >
         <NavDrawerBody>
           <AppItem as="a" className={styles.titleItem}>Categorías</AppItem>
-          {categories != null && categories.map((x) => (
+          {categories !== null && categories.map((x) => (
             <NavItem
               className={styles.navItem}
               key={x.ContentTypeId}
