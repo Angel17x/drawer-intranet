@@ -55,7 +55,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
       <div className={styles.root}>
       <div className={styles.header}>
         <button className={styles.button}>
-          <Arrow direction='left' themePrimary="var(--themePrimary)" themeDark="var(--themeDark)"/>
+          <Arrow direction='left' width={8} height={17} />
           <span>Regresar</span>
         </button>
         <Breadcrumb className={styles.breadcrumb}>

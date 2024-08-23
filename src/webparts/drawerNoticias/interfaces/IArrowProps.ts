@@ -1,5 +1,5 @@
 export interface IArrowProps {
-  themePrimary: string;
-  themeDark: string;
+  width: number;
+  height: number;
   direction: "left" | "right";
 }
