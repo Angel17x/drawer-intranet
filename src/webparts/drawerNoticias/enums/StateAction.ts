@@ -1,0 +1,6 @@
+export enum StateActions {
+  LOADING = "LOADING",
+  SET_CATEGORIES = "SET_CATEGORIES",
+  SELECT_CATEGORY = "SELECT_CATEGORY",
+  ERROR = "ERROR",
+}

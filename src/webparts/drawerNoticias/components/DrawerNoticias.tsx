@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from '../styles/DrawerNoticias.module.scss';
-import type { ICategoryItem, IDrawerNoticiasProps } from '../interfaces';
-import { Breadcrumb, BreadcrumbButton, BreadcrumbDivider, BreadcrumbItem, Divider } from "@fluentui/react-components";
+import type { ICategoryItem, IDrawerNoticiasProps, IReducerState } from '../interfaces';
+import { Breadcrumb, BreadcrumbButton, BreadcrumbDivider, BreadcrumbItem, Divider, MessageBar, MessageBarBody, MessageBarTitle } from "@fluentui/react-components";
 import { Arrow } from './Arrow/Arrow';
 import {
   AppItem,
@@ -10,40 +10,70 @@ import {
   NavItem,
 } from "@fluentui/react-nav-preview";
 import { SPHttpClient } from '@microsoft/sp-http';
+import { reducerDrawer } from '../reducers/reducerDrawer';
+import { StateActions } from '../enums';
+import { Spinner } from '@fluentui/react';
 
+const initialState: IReducerState = {
+  loading: false,
+  categories: [
+    {
+      Title: "Todas las Categorías",
+      Categor_x00ed_as: "Todas Las Categorías",
+      ContentTypeId: "default_content_type_id",
+    }
+  ],
+  error: undefined,
+  selectedCategory: "Todas Las Categorías"
+}
 
 const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
 
-  const defaultCategory = "Todas Las Categorías";
-
-  const [selectedValue, setSelectedValue] = React.useState<string>(defaultCategory);
-  const [categories, setCategories] = React.useState<ICategoryItem[]>([]);
+  const url = context.pageContext.web.absoluteUrl + "/_api/web/lists/getbytitle('Categorias')/items";
+  const [state, dispatch] = React.useReducer(reducerDrawer, initialState)  
   
-  
-  const onSelectedValue = (_:any, data:any):void => {
-    setSelectedValue(data?.value ?? defaultCategory); 
+  const navigateToHome = ():void => {
+    window.location.href = context.pageContext.web.absoluteUrl;
   }
 
-  const fetchData = async () => {
-    const url = context.pageContext.web.absoluteUrl + "/_api/web/lists/getbytitle('Categorias')/items";
+  const setCategories = (data:any):void => {
+    const categories = (data.value ?? []) as ICategoryItem[];
+    dispatch({ type: StateActions.SET_CATEGORIES, payload: [ ...state.categories, ...categories ] });
+    console.log(state.categories);
+  }
+
+  const onError = (error:any):void => { 
+    dispatch({ type: StateActions.ERROR, payload: error.message });
+    console.error('Error loading data', error);
+  }
+
+  const onLoading = ():void => { 
+    dispatch({ type: StateActions.LOADING, payload: initialState });
+  }
+
+  const onCategoryChange = (_:any, data:any):void => {
+    dispatch({ type: StateActions.SELECT_CATEGORY, payload: data.value });
+  }
+
+  const fetchData = async (): Promise<void> => {
+    onLoading();
+
     try {
       const response = await context.spHttpClient.get(url, SPHttpClient.configurations.v1, {
-        headers: {
-          'Accept': 'application/json;odata=nometadata',
-          'odata-version': ''
-        }
+        headers: { 'Accept': 'application/json;odata=nometadata', 'odata-version': '' }
       });
-
       const data = await response.json();
-      console.log(data.value);
-      setCategories(data.value ?? []);
+      if(data.hasOwnProperty('odata.error')) {
+        throw new Error(data['odata.error'].message.value);
+      }
+      setCategories(data);
+      
     } catch (error) {
-      console.error('Error loading data', error);
+      onError(error);
     }
   };
 
   React.useEffect(() => {
-    setSelectedValue(defaultCategory);
     fetchData()
     .catch((err) => {
       console.log(err);
@@ -54,7 +84,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
     <>
       <div className={styles.root}>
       <div className={styles.header}>
-        <button className={styles.button}>
+        <button className={styles.button} onClick={navigateToHome}>
           <Arrow direction='left' width={8} height={17} />
           <span>Regresar</span>
         </button>
@@ -65,38 +95,43 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
           <BreadcrumbDivider />
           <BreadcrumbItem>
             <BreadcrumbButton>
-              Centro De Comunicaciones
+              {context.pageContext.web.title}
             </BreadcrumbButton>
           </BreadcrumbItem>
         </Breadcrumb>
-        {
-          categories.length !== 0 ?
-          <h2 className={styles.categoryTitle}>{categories.filter((x:ICategoryItem) => x.Title === selectedValue)[0]?.Title}</h2>
-          : <h2>{defaultCategory}</h2>
-        }
-        
+        <h2 className={styles.categoryTitle}>{state.selectedCategory}</h2>
         <p className={styles.count}>{1000} resultados</p>
       </div>
       <Divider className={styles.divider}/>
-      <NavDrawer
-        defaultSelectedValue={selectedValue}
-        onNavItemSelect={onSelectedValue}
-        open={true}
-        type={"inline"}
-        className={styles.navDrawer} // Aplicando estilos personalizados
-      >
-        <NavDrawerBody>
-          <AppItem as="a" className={styles.titleItem}>Categorías</AppItem>
-          {categories !== null && categories.map((x) => (
-            <NavItem
-              className={styles.navItem}
-              key={x.ContentTypeId}
-              value={x.Categor_x00ed_as}
-              as="a"
-            >{x.Title}</NavItem>
-          ))}
-        </NavDrawerBody>
-      </NavDrawer>
+      { state.loading && <Spinner labelPosition={'left'} label={'Cargando Categorías...'}/> }
+      { state.error && 
+      <MessageBar key={"error"} intent={"error"}>
+        <MessageBarBody >
+          <MessageBarTitle>Error</MessageBarTitle>
+          <p>{state.error}</p>
+        </MessageBarBody>
+      </MessageBar> }
+      { (!state.error && !state.loading) && state.categories.length !== 0 &&
+        <NavDrawer
+          defaultSelectedValue={state.selectedCategory}
+          onNavItemSelect={onCategoryChange}
+          open={true}
+          type={"inline"}
+          className={styles.navDrawer} // Aplicando estilos personalizados
+        >
+          <NavDrawerBody>
+            <AppItem as="a" className={styles.titleItem}>Categorías</AppItem>
+            {!state.error && state.categories.length !== 0 && state.categories.map((x:ICategoryItem) => (
+              <NavItem
+                className={styles.navItem}
+                key={x.ContentTypeId}
+                value={x.Categor_x00ed_as}
+                as="a"
+              >{x.Title}</NavItem>
+            ))}
+          </NavDrawerBody>
+        </NavDrawer> 
+      }
     </div>
     </>
   );
