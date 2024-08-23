@@ -5,4 +5,5 @@ export interface IReducerState {
   categories: ICategoryItem[];
   error?: string;
   selectedCategory: string;
+  selectedListId?: string;
 }

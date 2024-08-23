@@ -77,7 +77,7 @@
         font-size: 16px;
         background-color: transparent;
         &::after {
-          background-color: #004E9B;
+          background-color: var(--themeOrange) !important;
           margin-inline-start: -20px
         }
     }

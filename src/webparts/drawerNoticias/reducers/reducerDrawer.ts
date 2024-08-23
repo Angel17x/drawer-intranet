@@ -1,8 +1,18 @@
 import { StateActions } from "../enums";
 import { IReducerAction, IReducerState } from "../interfaces";
 
-export const reducerDrawer = (state: IReducerState, action: IReducerAction) => {
+export const reducerDrawer = (
+  state: IReducerState,
+  action: IReducerAction
+): IReducerState => {
   switch (action.type) {
+    case StateActions.SELECTED_LIST:
+      return {
+        ...state,
+        loading: false,
+        error: undefined,
+        selectedListId: action.payload,
+      };
     case StateActions.LOADING:
       return {
         ...state,

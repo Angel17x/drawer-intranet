@@ -1,6 +1,7 @@
 declare interface IDrawerNoticiasWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
+  SelectedListId: string;
   DescriptionFieldLabel: string;
   AppLocalEnvironmentSharePoint: string;
   AppLocalEnvironmentTeams: string;
@@ -13,7 +14,7 @@ declare interface IDrawerNoticiasWebPartStrings {
   UnknownEnvironment: string;
 }
 
-declare module 'DrawerNoticiasWebPartStrings' {
+declare module "DrawerNoticiasWebPartStrings" {
   const strings: IDrawerNoticiasWebPartStrings;
   export = strings;
 }

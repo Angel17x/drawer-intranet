@@ -1,7 +1,7 @@
 define([], function() {
   return {
-    "PropertyPaneDescription": "Description",
-    "BasicGroupName": "Group Name",
+    "PropertyPaneDescription": "Panel de configuración del drawer de noticias",
+    "BasicGroupName": "Configuración",
     "DescriptionFieldLabel": "Description Field",
     "AppLocalEnvironmentSharePoint": "The app is running on your local environment as SharePoint web part",
     "AppLocalEnvironmentTeams": "The app is running on your local environment as Microsoft Teams app",

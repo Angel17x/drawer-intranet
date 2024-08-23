@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from '../styles/DrawerNoticias.module.scss';
 import type { ICategoryItem, IDrawerNoticiasProps, IReducerState } from '../interfaces';
-import { Breadcrumb, BreadcrumbButton, BreadcrumbDivider, BreadcrumbItem, Divider, MessageBar, MessageBarBody, MessageBarTitle } from "@fluentui/react-components";
+import { Breadcrumb, BreadcrumbButton, BreadcrumbDivider, BreadcrumbItem, Divider, MessageBar, MessageBarBody, MessageBarTitle, Skeleton, SkeletonItem } from "@fluentui/react-components";
 import { Arrow } from './Arrow/Arrow';
 import {
   AppItem,
@@ -12,7 +12,6 @@ import {
 import { SPHttpClient } from '@microsoft/sp-http';
 import { reducerDrawer } from '../reducers/reducerDrawer';
 import { StateActions } from '../enums';
-import { Spinner } from '@fluentui/react';
 
 const initialState: IReducerState = {
   loading: false,
@@ -24,13 +23,13 @@ const initialState: IReducerState = {
     }
   ],
   error: undefined,
-  selectedCategory: "Todas Las Categorías"
+  selectedCategory: "Todas las Categorías",
 }
 
-const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
+const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context, selectedListId }) => {
 
-  const url = context.pageContext.web.absoluteUrl + "/_api/web/lists/getbytitle('Categorias')/items";
-  const [state, dispatch] = React.useReducer(reducerDrawer, initialState)  
+  
+  const [state, dispatch] = React.useReducer(reducerDrawer, { ...initialState })  
   
   const navigateToHome = ():void => {
     window.location.href = context.pageContext.web.absoluteUrl;
@@ -38,8 +37,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
 
   const setCategories = (data:any):void => {
     const categories = (data.value ?? []) as ICategoryItem[];
-    dispatch({ type: StateActions.SET_CATEGORIES, payload: [ ...state.categories, ...categories ] });
-    console.log(state.categories);
+    dispatch({ type: StateActions.SET_CATEGORIES, payload: [ ...initialState.categories, ...categories ] });
   }
 
   const onError = (error:any):void => { 
@@ -57,7 +55,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
 
   const fetchData = async (): Promise<void> => {
     onLoading();
-
+    const url = context.pageContext.web.absoluteUrl + "/_api/web/lists/getbytitle('"+selectedListId+"')/items";
     try {
       const response = await context.spHttpClient.get(url, SPHttpClient.configurations.v1, {
         headers: { 'Accept': 'application/json;odata=nometadata', 'odata-version': '' }
@@ -67,18 +65,28 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
         throw new Error(data['odata.error'].message.value);
       }
       setCategories(data);
-      
+      onSelectedList();
     } catch (error) {
       onError(error);
     }
   };
 
+  const onSelectedList = ():void => {
+    dispatch({ type: StateActions.SELECTED_LIST, payload: selectedListId })
+  }
+
+  // const setFilter = () => {
+
+  // }
+
   React.useEffect(() => {
-    fetchData()
-    .catch((err) => {
-      console.log(err);
-    });
-  }, [])
+    if(selectedListId !== undefined) {
+      fetchData()
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+  }, [selectedListId])
 
   return (
     <>
@@ -89,7 +97,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
           <span>Regresar</span>
         </button>
         <Breadcrumb className={styles.breadcrumb}>
-          <BreadcrumbItem>
+          <BreadcrumbItem onClick={navigateToHome}>
             <BreadcrumbButton>Home</BreadcrumbButton>
           </BreadcrumbItem>
           <BreadcrumbDivider />
@@ -99,11 +107,29 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
             </BreadcrumbButton>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h2 className={styles.categoryTitle}>{state.selectedCategory}</h2>
-        <p className={styles.count}>{1000} resultados</p>
+        {state.selectedListId !== undefined && <h2 className={styles.categoryTitle}>{state.selectedCategory}</h2>}
+        {state.selectedListId !== undefined && <p className={styles.count}>{1000} resultados</p>}
       </div>
       <Divider className={styles.divider}/>
-      { state.loading && <Spinner labelPosition={'left'} label={'Cargando Categorías...'}/> }
+      { !state.selectedListId && !state.error &&  
+      <MessageBar key={"warning"} intent={"warning"}>
+      <MessageBarBody >
+        <MessageBarTitle>Alerta</MessageBarTitle>
+        <p>Por favor seleccione la lista de las categorías</p>
+      </MessageBarBody>
+    </MessageBar> }
+      { state.loading && 
+      <Skeleton animation='pulse' aria-label="Loading Content">
+        <SkeletonItem size={32}/>
+        <div style={{ marginBottom: "10px" }}></div>
+        <SkeletonItem size={32}/>
+        <div style={{ marginBottom: "10px" }}></div>
+        <SkeletonItem size={32}/>
+        <div style={{ marginBottom: "10px" }}></div>
+        <SkeletonItem size={32}/>
+        <div style={{ marginBottom: "10px" }}></div>
+        <SkeletonItem size={32}/>
+      </Skeleton> }
       { state.error && 
       <MessageBar key={"error"} intent={"error"}>
         <MessageBarBody >
@@ -111,9 +137,9 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
           <p>{state.error}</p>
         </MessageBarBody>
       </MessageBar> }
-      { (!state.error && !state.loading) && state.categories.length !== 0 &&
+      { (!state.error && !state.loading && state.selectedListId !== undefined) && state.categories.length !== 0 &&
         <NavDrawer
-          defaultSelectedValue={state.selectedCategory}
+          defaultSelectedValue={initialState.selectedCategory}
           onNavItemSelect={onCategoryChange}
           open={true}
           type={"inline"}
@@ -125,7 +151,7 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context }) => {
               <NavItem
                 className={styles.navItem}
                 key={x.ContentTypeId}
-                value={x.Categor_x00ed_as}
+                value={x.Title}
                 as="a"
               >{x.Title}</NavItem>
             ))}
