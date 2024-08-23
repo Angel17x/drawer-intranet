@@ -75,11 +75,12 @@ const DrawerNoticias:React.FC<IDrawerNoticiasProps> = ({ context, selectedListId
     dispatch({ type: StateActions.SELECTED_LIST, payload: selectedListId })
   }
 
-  // const setFilter = () => {
-
-  // }
+  const setFilter = () => {
+    
+  } 
 
   React.useEffect(() => {
+    setFilter();
     if(selectedListId !== undefined) {
       fetchData()
       .catch((err) => {
